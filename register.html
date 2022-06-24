@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>注册</title>
+  <style>
+  body{
+	margin: 0;
+	padding: 0;
+	background: url(./images/7.jpg) no-repeat center center;
+  background-size:100% 100%;
+  background-attachment:fixed;
+  }
+  .box{
+  	width: 300px;
+  	padding: 40px;
+  	position: absolute;
+  	top: 50%;
+  	left: 50%;
+  	transform: translate(-50%,-50%);
+  	background-color: #00000068;
+  	text-align: center;
+    border-radius: 5px;
+  }
+  
+  .box input[type = "text"],.box input[type = "password"]{
+  	border: 0;
+  	background: none;
+  	display: block;
+  	margin: 20px auto;
+    margin-bottom: 10px;
+  	text-align: center;
+  	border: 2px solid #c8d6e5;
+  	padding: 14px 10px;
+  	outline: none;
+  	color: #ffffff;
+  	border-radius: 24px;
+  	transition: 0.25s;
+  }
+  /* .box span{
+      display: block;
+  } */
+  h1{
+  	color: #FFFFFF;
+  	text-transform: uppercase;
+  	font-weight: 500;
+  }
+  
+  /* .box input[type = "text"]:focus, .box input[type = "password"]:focus{
+  	width: 280px;
+  	border-color: #FFFFFF;
+  } */
+  .box input[type = "submit"],.box input[type = "button"]{
+  	border: 0;
+  	font-size: 17px;
+  	background: none;
+  	display: block;
+    float: left;
+  	text-align: center;
+  	border: 2px solid #FFFFFF;
+  	padding: 14px 40px;
+  	outline: none;
+  	color: #ffffff;
+  	border-radius: 24px;
+  	transition: 0.25s;
+  	cursor: pointer;
+  }
+  .box input[type = "submit"]{
+    margin: 0 20px;
+  }
+  .box input[type = "button"]{
+    background-color:rgba(135, 206, 235,.2);
+  }
+  .box input[type = "submit"]:hover,.box input[type = "button"]:hover{
+  	background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+  	/* font-size: x-large; */
+  	
+  }
+  .yh,.mm{
+  background-color: rgba(135, 206, 235,.2);
+  border-radius: 5px;
+  padding: 3px;
+  font-size: 14px;
+  color: skyblue;
+  font-weight: bold;
+  width: 100px;
+  }
+    ul{list-style-type: none;padding: 0;}
+  </style>
+  <script src="./js/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <form action="http://teach.mengmacoding.com/interface/register.php" method="post" autocomplete="off" class="box">
+     <ul>
+       <li><label for="uname" class="yh">用户名：</label>
+       <input type="text" name="uname" id="uname" >
+       <span></span>
+      </li>
+       <li><label for="pwd" class="mm">密&nbsp;&nbsp;码：</label>
+       <input type="password" name="pwd" id="pwd"></li>
+       <li>
+       <input type="submit" value="注册"></li>
+       <input type="button" value="登录"></li>
+     </ul>
+    </form>
+</body>
+</html>
+<script>
+   $("input[type='text']").blur(function(){
+    var uname=$(this).val();//获取用户输入的用户名
+   //触发ajax
+   $.ajax({
+   type: "get",
+   //url: "http://teach.mengmacoding.com/interface/check.php?unserame="+uname,//请求地址
+   //  data: " unserame="+uname,  //提交的数据
+   url: "http://teach.mengmacoding.com/interface/check.php",
+   data:{username:uname},
+   dataType:"json",
+   success: function(data){
+    if(data.errCode == 0){
+      $("span").text("用户名可用").css("color","green");
+    }else{
+      $("span").text("用户名已存在").css("color","red");
+    }
+   } 
+   });
+   })
+   // 用户注册
+   $("form").submit(function(){
+   var url= $(this).attr("action");
+   var uname=$("#uname").val();//获取用户输入的用户名
+   var pwd=$("#pwd").val();//获取用户输入的密码
+   //验证数据合法性
+        if(uname==""||pwd==""){
+          alert("用户名或密码为空！~");
+          return false;
+        }else
+        console.log(uname,pwd);
+   //触发ajax
+   $.ajax({
+   type: "post",
+   //url: "http://teach.mengmacoding.com/interface/register.php",
+   url:url,
+   //  data:"username="+uname+"&password"+pwd,
+   data:{username:uname,password:pwd},
+   dataType:"json",
+   success: function(msg){
+    // alert( "9用户名:"+uname+"恭喜注册成功！");
+        console.log(msg);
+        if(msg.errCode==0){
+          alert("注册成功~");
+          window.location.href="./register.html";
+        }else{
+          alert("注册失败！~");
+        }
+   }
+   });
+   //阻止表单提交--当前事件中触发的ajax已经
+   return false;
+   })
+   //用户登录
+   $(":button").click(function(){
+    console.log(1223)
+    var uname=$("#uname").val();//获取用户输入的用户名
+    var pwd=$("#pwd").val();//获取用户输入的密码
+    //触发ajax
+    
+   $.ajax({
+   type: "post",
+   url: "http://teach.mengmacoding.com/interface/login.php",
+   //  data:"username="+uname+"&password"+pwd,
+   data:{username:uname,password:pwd},
+   dataType:"json",
+   success: function(msg1){
+    if(msg1.errCode == 0){
+                //通过URL将用户id和用户名传递给chat.html
+                window.location.href = encodeURI("chat.html?uid="+msg1.userInfo.userid
+                +"&uname="+msg1.userInfo.username);
+               /*  sessionStorage.setItem("uid",data.msg1.userInfo.userid);
+                sessionStorage.setItem("uname",data.msg1.userInfo.username);
+                window.location.href("chat.html"); */
+            }else{
+                alert("用户名或密码错误！~");
+            }
+     }
+    });
+   })
+</script>

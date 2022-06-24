@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室</title>
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+        }
+        ul{
+            list-style: none;
+        }
+        #chatBox{
+            width:900px;
+            height:700px;
+            border-radius: 10px;
+            border:2px #4e6ef2 solid;
+            margin:20px auto;
+            position: relative;
+        }
+        .msg{
+            float:left;
+            border-right:2px #4e6ef2 solid;
+            width:698px;
+            height:700px;
+        }
+        .header{
+            height:50px;
+            background-color:#4e6ef2;
+            border-radius: 7px 0 0 0;
+        }
+        .chatList{
+            padding:10px;
+            border-bottom:1px #4e6ef2 solid;
+            height:450px;
+            overflow: auto;
+        }
+        /* .chatList li{
+    
+        } */
+        .chatList li .say{
+            position: relative;
+            line-height:30px;
+            margin-top:10px;
+        }
+        .chatList li .say span:nth-child(2){
+            color:#ccc;
+            position: absolute;
+            width:160px;
+            left:50%;
+            font-size:14px;
+            margin-left:-80px;
+        }
+        .chatList li .contentBox{
+            border:1px #ccc solid;
+            padding:5px;
+            border-radius: 5px;
+            position: relative;
+            margin-top:10px;
+            word-wrap: break-word;
+        }
+        .chatList li .contentBox .tra{
+            width:10px;
+            height:10px;
+            border:1px #ccc solid;
+            transform: rotateZ(45deg);
+            position: absolute;
+            top:-7px;
+            left:10px;
+            border-bottom: 0;
+            border-right: 0;
+            z-index: 99;
+            background-color:#fff;
+        }
+        .msgBox{
+            width: 680px;
+            height:120px;
+            padding:10px;
+            position: absolute;
+            bottom: 10px;
+            text-align: right;
+        }
+        .msgBox textarea{
+            outline: none;
+            padding:5px;
+            font-size:18px;
+            font-family: 微软雅黑;
+        }
+        .msgBox input{
+            width:90px;
+            height:30px;
+            background-color:#4e6ef2;
+            border:0;
+            font-size:16px;
+            color:#fff;
+            border-radius: 5px;
+            outline: none;
+        }
+        .toolBar{
+            height:50px;
+            line-height: 50px;
+            background-color:rgba(0,0,0,.1);
+            padding:0 20px;
+        }
+        .toolBar .username{
+            float:left;
+        }
+        .toolBar .logout{
+            float:right;
+            cursor: pointer;
+        }
+        .online{
+            float:left;
+            width:180px;
+            line-height: 30px;
+            padding:0 10px;
+            overflow: auto;
+            height: 700px;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="toolBar">
+            <div class="username">我是大魔王</div>
+            <div class="logout">退出</div>
+        </div>
+        <div id="chatBox">
+            <div class="msg">
+                <div class="header"></div>
+                <ul class="chatList">
+                    <!-- <li>
+                        <div class="say"><span>某某说：</span><span>2022/4/15 15:58</span></div>
+                        <div class="contentBox">
+                            <div>今天作业好难啊~~</div>
+                            <div class="tra"></div>
+                        </div>
+                    </li> -->
+                </ul>
+                <div class="msgBox">
+                    <form action="" method="POST">
+                        <!--隐藏域传递用户id和用户名-->
+                        <input type="hidden" name="userid">
+                        <input type="hidden" name="username">
+                        <textarea cols="70" rows="3" name="content"></textarea>
+                        <input type="submit" value="发&nbsp;&nbsp;送">
+                    </form>
+                </div>
+            </div>
+            <div class="online">
+                <div class="total">当前在线用户:0人</div>
+            </div>
+        </div>
+    </body>
+    </html>
+<script>
+    //获取或者设置相关信息
+    // console.log(window.location)
+    var queryString = decodeURI(location.search.slice(1));
+    console.log(queryString);
+    var str="a=b&c=d&e=f";
+    var queryobj={};
+    queryString.split("&").forEach(function(val){
+        // console.log(val)
+        // obj[val.slice(0,val.indexOf("="))] =val.slice(val.indexOf("=")+1);
+        var vals=val.split("=");
+        queryobj[vals[0]]=vals[1];
+        // console.log(vals);
+    })
+    console.log(queryobj);
+    $(".username").text(queryobj.uname);
+    $(function(){
+        $.ajax({
+            type:"get",
+            url:"http://teach.mengmacoding.com/interface/msg.php?limit=15",
+            dataType:"json",
+            success:function(data){
+               var nr = "";
+               console.log(data);
+               for(var x in data.msg){
+                   // console.log(x);
+                   /* var date =data.msg[x].systime;
+                   var newDate=new Date();
+                   newDate.setTime(date*1000);
+                   console.log(newDate.toLocaleString()); */
+                   nr += `<li>
+                           <div class="say">
+                               <span>${data.msg[x].username}说：</span>
+                               <span>${new Date(data.msg[x].systime*1000).toLocaleString()}</span>
+                           </div>
+                           <div class="contentBox">
+                               <div>${data.msg[x].content}</div>
+                               <div class="tra"></div>
+                           </div>
+                       </li>`;
+               }
+               $(".chatList").html(nr);
+               // $(".chatList").scrollTop($(".chatList")[0].scrollHeight);
+               $(".chatList").scrollTop(3000); //显示到最底部
+            }
+        })
+    //显示在线用户
+    $.ajax({
+        type:"post",
+        url:"http://teach.mengmacoding.com/interface/user.php",
+        dataType:"json",
+        success:function(data){
+            $(".total").text("在线用户："+data.userInfo.length+"人")
+            var nn="";
+            for(var i in data.userInfo){
+                $(".total").after("<p>"+data.userInfo[i].username+"<p>")
+            }
+        }
+      })
+    })
+    //发送
+    var content='';
+    $("form").submit(function(){
+        content=$("textarea").val();
+        if(content == ""){
+            alert("消息不能为空~")
+            return false;
+        }
+        $.ajax({
+            type:"post",
+            url:"http://teach.mengmacoding.com/interface/chat.php",
+            // data:$("form").serialize(),
+            /* serialize()：将表单中的数据自动拼接成字符串的参数，可用于Ajax请求
+            var params=$("form").serialize();
+            name=zhangsan&age=30 */
+            data:{content:content,
+                username:queryobj.uname,
+                userid:queryobj.uid
+            },
+            dataType:"json",
+            success:function(data){
+                location.reload();
+            }
+        })
+        return false;
+    })
+    //退出
+    $(".logout").click(function(){
+        $.ajax({
+            type:"get",
+           /*url:"http://teach.mengmacoding.com/interface/logout.php",
+            data:{userid:queryobj.userid}, */
+            url:"http://teach.mengmacoding.com/interface/logout.php?userid="+sessionStorage.getItem("uid"),
+            dataType:"json",
+            success:function(data){
+                sessionStorage.clear();
+                alert("退出成功!~");
+                window.location.href="./register.html"
+            }
+        })
+    })
+</script>
